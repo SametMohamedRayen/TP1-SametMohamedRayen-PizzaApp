@@ -3,9 +3,11 @@ package com.gl4.pizzaapplication
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.RadioButton
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.google.android.material.textfield.TextInputEditText
 
@@ -28,6 +30,44 @@ class MainActivity : AppCompatActivity() {
     lateinit var poivrons:CheckBox
     lateinit var jambon:CheckBox
 
+    private fun taille() : String {
+        if(miniRadioButton.isChecked) {
+            return "Mini"
+        }else if (moyenneRadioButton.isChecked){
+            return "Moyenne"
+        } else {
+            return "Maxi"
+        }
+    }
+
+    private fun toppings() : String {
+        var toppingsStr = ""
+        if(fromage.isChecked) {
+            toppingsStr += "Fromage,"
+        }
+        if(champignon.isChecked) {
+            toppingsStr += "Champignon,"
+        }
+        if(thon.isChecked) {
+            toppingsStr += "Thon,"
+        }
+        if(pepperoni.isChecked) {
+            toppingsStr += "Pepperoni,"
+        }
+        if(roquefort.isChecked) {
+            toppingsStr += "Roquefort,"
+        }
+        if(pineapple.isChecked) {
+            toppingsStr += "Pineapple,"
+        }
+        if(poivrons.isChecked) {
+            toppingsStr += "Poivrons,"
+        }
+        if(jambon.isChecked) {
+            toppingsStr += "Jambon,"
+        }
+        return toppingsStr.substring(0,toppingsStr.length-2)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,12 +91,29 @@ class MainActivity : AppCompatActivity() {
         jambon = findViewById(R.id.checkBox6)
 
 
+
+
         btnEmail = findViewById(R.id.buttonEmail)
         btnSMS = findViewById(R.id.buttonSMS)
 
         if(ActivityCompat.checkSelfPermission(this, android.Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.SEND_SMS), 111)
 
+        }
+
+
+
+        btnSMS.setOnClickListener {
+            if(nom.text.toString().isEmpty() || prenom.text.toString().isEmpty() || adresse.text.toString().isEmpty() ||
+                (!miniRadioButton.isChecked && !moyenneRadioButton.isChecked && !maxiRadioButton.isChecked)) {
+                val toast = Toast.makeText(applicationContext, "Vous devez indiquez vos infos et la taille du pizza désiré !",Toast.LENGTH_LONG)
+                toast.show()
+            }
+            else {
+                val commande = "Nom : ${nom.text.toString()}\nPrénom : ${prenom.text.toString()}\nAddresse : ${adresse.text.toString()}\nTaille : ${taille()}\nToppings : ${toppings()}"
+                val sms = SmsManager.getDefault()
+                sms.sendTextMessage("+21611111111","Pizza",commande,null,null)
+            }
         }
 
 
